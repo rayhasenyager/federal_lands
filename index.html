@@ -1,72 +1,206 @@
-<!DOCTYPE html>
 <html>
 
 <head>
-    <meta charset=utf-8 />
-    <title>Kenya Livestock Populations</title>
-    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <meta charset="utf-8">
+    <title>AL Counties</title>
 
-    <link href='https://api.mapbox.com/mapbox.js/v2.2.4/mapbox.css' rel='stylesheet' />
-    <link href='https://fonts.googleapis.com/css?family=Work+Sans:400,500,600' rel='stylesheet' type='text/css'>
-    <link href='css/styles.css' rel='stylesheet' />
+    <link href="http://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+            background: #778899;
+            font-family: Montserrat, sans-serif;
+        }
+        
+        h1,h2,h3,h4,h5 {
+            font-size: 2em;
+            font-weight: 100;
+            color: #005DAA;
+            margin: 5px 0 10px 15px;
+            max-width: 300px;
+        }
+        
+        h2 {
+            top: 95px;
+            font-size: 1.2em;
+        }
+        
+        h3 {
+            top: 120px;
+            font-size: 1em;
+        }
+        
+        h4 {
+            top: 85px;
+            font-size: 1.2em;
+        }
+        
+        h5 {
+            top: 110px;
+            font-size: 1em;
+        }
+        
+        #map {
+            width: 900px;
+            height: 900px;
+            position: absolute;
+            left: 350px;
+            top: 0;
+            border: 1px solid #d3d3d3;
+            background: #FFEBCD;
+        }
+        .land {
+            fill: #F0F8FF;
+        }
+        
+        .state {
+            fill: none;
+            stroke: #40E0D0;
+            stroke-width: 2;
+        }
+        
+        .centroid {
+            fill: orange;
+        }
 
+    </style>
 </head>
 
 <body>
 
-    <div id='map'></div>
-    <div id='side-panel'>
-        <h1>Livestock populations in Kenya</h1>
-        <p>Discovering where livestock are most concentrated will aid the firm in developing regional sales areas. The map is one factor among many to develop a sales plan in Kenya. Other areas that should be investigated and mapped are urban development, threat zones, and competitors.</p>
-        <h2> About the map</h2>
-        <p>The map displays by each county rings, scaled to the population, of each livestock catogry. The counties are also displayed and are categorized nased on density. Hovering the mouse over each green ring will display an information window with County name, population, and specific density.</p>
-        <h2> About the data</h2>
-        <p>The data was mined from the Kenya Open Data (https://opendata.go.ke/). Density was calculated using each county's area in kilometers.</p>
-    </div>
-    <div id="legend">
-        <h3>Livestock per county</h3>
-        <p class="cattle"><span style='background:#6813D2;'></span>
-            <label> Cattle</label>
-        </p>
-        <p class="goats"><span style='background:#DAA520;'></span>
-            <label> Goats</label>
-        </p>
-        <p class="sheep"><span style='background:#008000;'></span>
-            <label> Sheep</label>
-        </p>
-        <h4>Counties (livestock per sq km):</h4>
-        <p class="zero"><span class="square" style='background:#ca641c;'></span>
-            <label> 21.41 - 55.99</label>
-        </p>
-        <p class="one"><span class="square" style='background:#9d4e15;'></span>
-            <label> 71.76 - 95.5</label>
-        </p>
-        <p class="two"><span class="square" style='background:#874312;'></span>
-            <label> 137.84 - 190.62</label>
-        </p>
-        <p class="three"><span class="square" style='background:#5a2d0c;'></span>
-            <label> 195.8 - 263.93</label>
-        </p>
-        <p class="four"><span class="square" style='background:#2d1606;'></span>
-            <label> 296.34 - 362.96</label>
-        </p>
-        <small>Source: <a href="https://opendata.go.ke/">Kenya Open Data</a></small>
-    </div>
+    <h1>Fed Lands</h1>
+    <h2></h2>
+    <h3></h3>
+    <h4></h4>
+    <h5></h5>
+    <div id="map"></div>
 
-    <div id="info">
-        <p>County: <span></span></p>
-        <p class="cattle">Cattle <span></span>: <span></span></p>
-        <p class="goats">Goats <span></span>: <span></span></p>
-        <p class="sheep">Sheep <span></span>: <span></span></p>
-        <p class="density">Density <span></span>: <span></span></p>
-    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.19/topojson.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.2/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/1.10.0/d3-legend.min.js"></script>
 
-    <script src='https://api.mapbox.com/mapbox.js/v2.2.4/mapbox.js'></script>
-    <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.2.0/leaflet-omnivore.min.js'></script>
-    <script src='https://code.jquery.com/jquery-1.12.0.min.js'></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/simple-statistics/1.0.1/simple_statistics.js"></script>
-    <script src="js/main.js"></script>
-    
+    <script>
+        var width = 900,
+            height = 900;
+
+        var svg = d3.select("#map")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+        var projection = d3.geo.conicConformal()
+            .center([0, 40.5])
+            .rotate([113, 0])
+            .scale(2500)
+            .translate([width / 2, height / 2]);
+        
+        var fedStatByfedId = d3.map();
+
+        var color = d3.scale.linear()
+            .domain(["BLM", "BOR", "DOD", "DOE", "FS", "FWS", "NPS", "Other", "USDA"])
+            .range(["#DEB887", "#4169E1","#DEB887", "#4169E1","#DEB887", "#4169E1","#DEB887", "#4169E1","#DEB887"]);
+
+        var ordinal = d3.scale.ordinal()
+            .domain(["BLM", "BOR", "DOD", "DOE", "FS", "FWS", "NPS", "Other", "USDA"])
+            .range(["#DEB887", "#4169E1","#DEB887", "#4169E1","#DEB887", "#4169E1","#DEB887", "#4169E1","#DEB887"]);
+
+        var geoPath = d3.geo.path()
+            .projection(projection);
+
+        var legendOrdinal = d3.legend.color()
+              .shape("path", d3.svg.symbol().type("square").size(150)())
+              .shapePadding(10)
+              .scale(ordinal);
+
+        queue()
+            .defer(d3.json, 'fedlands-topo.json')
+            .defer(d3.json, 'eleven_states.json')
+            .defer(d3.csv, 'elevenwest.csv')
+            .defer(d3.csv, 'land-data.csv')
+            .await(makeMap);
+
+        function makeMap(error, lands, states, centers, stats) {
+            console.log(lands);
+            console.log(states);
+            console.log(centers);
+            console.log(stats);
+            
+            var data = [];
+
+                centers.forEach(function(place) {
+                    data.push(Number(place.percent));
+                });
+
+                var min = Math.min.apply(Math, data),
+                      max = Math.max.apply(Math, data);
+
+                var radius = d3.scale.sqrt()
+                    .domain([min, max])
+                    .range([29, 84.9]);
+                
+            svg.append('g')
+                .selectAll('path')
+                .data( topojson.feature(lands, lands.objects.fedland).features)
+                .enter()
+                .append('path')
+                .attr( "d", geoPath )
+                .attr("class", function(d) { return color(lands.ADMIN1);
+                })
+            
+            svg.append("g")
+                .selectAll("path")
+                .data(states.features)
+                .enter()
+                .append("path")
+                .attr("d", geoPath)
+                .attr("class", "state");
+
+            svg.append("g")
+                .selectAll("circle")
+                .data(centers)
+                .enter()
+                .append("circle")
+                .attr("cx", function(d) {
+                    d.position = projection([d.lon, d.lat])
+                    return d.position[0];
+                })
+                .attr("cy", function(d) {
+                    return d.position[1];
+                })
+                .attr("r", function(d) {
+                    return radius(d.percent)
+                })
+                .attr("class", "centroid")
+//                .on('mouseover', function(d, i) {
+//                    var currentCity = this;
+//                    d3.select(this)
+//                        .style({
+//                            'fill': '#DC143C',
+//                        });
+//                    d3.select("h4").text('City or Club Name:');
+//                    d3.select("h5").text(d.city);
+//                })
+//                .on('mouseout', function(d, i) {
+//                    d3.select("h4").text("");
+//                    d3.select("h5").text("");
+//                    d3.selectAll('circle')
+//                        .style({
+//                            'fill': 'orange'
+//                        });
+//                })
+//
+            svg.append("g")
+                .attr("class", "legendOrdinal")
+                .attr("transform", "translate(20,20)");
+
+            svg.select(".legendOrdinal")
+                .call(legendOrdinal);
+        }
+
+    </script>
 </body>
 
 </html>
