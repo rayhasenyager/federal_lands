@@ -63,6 +63,16 @@
         .centroid {
             fill: orange;
         }
+        
+        div.tooltip {
+            color: #222;
+            background-color: #fff;
+            padding: .5em;
+            text-shadow: #f5f5f5 0 1px 0;
+            border-radius: 2px;
+            opacity: 0.9;
+            position: absolute;
+        }
 
     </style>
 </head>
@@ -96,16 +106,14 @@
             .rotate([113, 0])
             .scale(2500)
             .translate([width / 2, height / 2]);
-        
-        var fedStatByfedId = d3.map();
 
         var color = d3.scale.linear()
             .domain(["BLM", "BOR", "DOD", "DOE", "FS", "FWS", "NPS", "Other", "USDA"])
-            .range(["#DEB887", "#4169E1","#DEB887", "#4169E1","#DEB887", "#4169E1","#DEB887", "#4169E1","#DEB887"]);
+            .range(["#DEB887", "#4169E1","#DEB887", "#4169E1","#DEB887", "#4169E1","#c88937", "#4169E1","#DEB887"]);
 
         var ordinal = d3.scale.ordinal()
             .domain(["BLM", "BOR", "DOD", "DOE", "FS", "FWS", "NPS", "Other", "USDA"])
-            .range(["#DEB887", "#4169E1","#DEB887", "#4169E1","#DEB887", "#4169E1","#DEB887", "#4169E1","#DEB887"]);
+            .range(["#ff4d4d", "#66ffff","#0066ff", "#884dff","#00b33c", "#888844","#DEB887", "#ff66cc","#ff8000"]);
 
         var geoPath = d3.geo.path()
             .projection(projection);
@@ -114,6 +122,9 @@
               .shape("path", d3.svg.symbol().type("square").size(150)())
               .shapePadding(10)
               .scale(ordinal);
+        
+        var tooltip = d3.select('body').append('div')
+            .attr('class', 'hidden tooltip');
 
         queue()
             .defer(d3.json, 'fedlands-topo.json')
@@ -174,24 +185,26 @@
                     return radius(d.percent)
                 })
                 .attr("class", "centroid")
-//                .on('mouseover', function(d, i) {
-//                    var currentCity = this;
-//                    d3.select(this)
-//                        .style({
-//                            'fill': '#DC143C',
-//                        });
-//                    d3.select("h4").text('City or Club Name:');
-//                    d3.select("h5").text(d.city);
-//                })
-//                .on('mouseout', function(d, i) {
-//                    d3.select("h4").text("");
-//                    d3.select("h5").text("");
-//                    d3.selectAll('circle')
-//                        .style({
-//                            'fill': 'orange'
-//                        });
-//                })
-//
+                .attr('d', geoPath)
+                .on('mouseover', function(d, i) {
+                    var currentCity = this;
+                    d3.select(this)
+                        .style({
+                            'fill': '#DC143C',
+                        });
+                    tooltip.classed('hidden', 'false')
+                    .attr('style', 'left:' + (currentCity[0] + 150) +
+                                'px; top:' + (currentCity[1] - 350) + 'px')
+                        .html(d.percent + "% Federally Owned");
+                    })
+                .on('mouseout', function() {
+                    tooltip.classed('hidden', true)
+                    d3.selectAll('circle')
+                        .style({
+                            'fill': 'orange'
+                        });
+                });
+
             svg.append("g")
                 .attr("class", "legendOrdinal")
                 .attr("transform", "translate(20,20)");
