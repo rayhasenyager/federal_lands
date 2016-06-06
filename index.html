@@ -9,57 +9,104 @@
         body {
             padding: 0;
             margin: 0;
-            background: #778899;
+            background: #8B4513;
             font-family: Montserrat, sans-serif;
         }
         
+        #side-panel {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 500px;
+            height: 900px;
+            background: whitesmoke;
+            border-right: 2px solid #8B4513;
+            overflow-y: auto;
+        }
+        
         h1 {
-            font-size: 2em;
-            font-weight: 100;
-            color: #005DAA;
-            margin: 5px 0 10px 15px;
-            max-width: 300px;
+            padding: 8px 25px 8px 15px;
+            margin: 0;
+            background: #8B4513;
+            color: whitesmoke;
+            font-weight: 400;
+            font-size: 1.5em;
+            text-align: right;
+        }
+        
+        h2 {
+            padding: 0px 25px 8px 15px;
+            margin: 0;
+            background: #8B4513;
+            color: whitesmoke;
+            font-weight: 300;
+            font-size: 1.5em;
+            text-align: right;
+        }
+        
+        h3 {
+            margin: 0;
+            padding: 8px 25px 8px 15px;
+            color: #8B4513;
+            font-weight: 500;
+            font-size: 1.2em;
+            text-align: right;
+        }
+        
+        #side-panel p {
+            margin: 8px 0 4px;
+            padding: 0 25px 0 15px;
+            color: #3d3d3d;
+            text-align: right;
+            font-size: 1em;
+        }
+        
+        #side-panel p:after {
+            content: '';
+            display: block;
+            clear: both;
         }
         
         #map {
             width: 900px;
             height: 900px;
             position: absolute;
-            left: 350px;
+            left: 500px;
             top: 0;
-            border: 1px solid #d3d3d3;
+            border: 1px solid #8B4513;
             background: #FFEBCD;
         }
+        
         .land {
             fill: #F0F8FF;
         }
         
         .state {
             fill: none;
-            stroke: #40E0D0;
-            stroke-width: 2;
+            stroke: #8B4513;
+            stroke-width: 1.5px;
         }
         
         .state2 {
-            fill: blue;
+            fill: #d9d9d9;
             stroke: none;
-            stroke-width: 2;
         }
         
         .centroid {
-            fill: orange;
+            fill: #8B4513;
         }
         
         div.tooltip {
-            color: #222;
-            background-color: #fff;
-            padding: .5em;
-            text-shadow: #f5f5f5 0 1px 0;
-            border-radius: 2px;
-            opacity: 0.9;
-/*            position: absolute;*/
-            float: right;
+            position: absolute;
+            left: 1400px;
+            top: 0;
+            bottom: 0;
             width: 200;
+            color: #2d1606;
+            background-color: #8B4513;
+            padding: .5em;
+            opacity: 1;
         }
 
     </style>
@@ -67,8 +114,16 @@
 
 <body>
 
-    <h1>Fed Lands</h1>
     <div id="map"></div>
+    <div id='side-panel'>
+        <h1>Federal Owned Lands of the American West: </h1>
+        <h2>It’s a lot</h2>
+        <p>reason for map</p>
+        <h3> About the map</h3>
+        <p>describe map features like the radio buttons/check boxes, hover</p>
+        <h3> About the data</h3>
+        <p>sources, other category</p>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script>
@@ -91,24 +146,20 @@
             .scale(2500)
             .translate([width / 2, height / 2]);
 
-        var color = d3.scale.linear()
-            .domain(["BLM", "BOR", "DOD", "DOE", "FS", "FWS", "NPS", "Other", "USDA"])
-            .range(["#ff4d4d", "#66ffff","#0066ff", "#884dff","#00b33c", "#888844","#DEB887", "#ff66cc","#ff8000"]);
-
         var ordinal = d3.scale.ordinal()
-            .domain(["BLM", "BOR", "DOD", "DOE", "FS", "FWS", "NPS", "Other", "USDA"])
-            .range(["#ff4d4d", "#66ffff","#0066ff", "#884dff","#00b33c", "#888844","#DEB887", "#ff66cc","#ff8000"]);
+            .domain(["State/Private Owned Lands", "BLM", "DOD", "DOE", "FS", "FWS", "NPS", "Other"])
+            .range(["#d9d9d9", "#428DBD", "#0B3660", "#C6A6E8", "#00502F", "#F69E23", "#C56C39", "#FC4D38"]);
 
         var geoPath = d3.geo.path()
             .projection(projection);
-        
+
         var tooltip = d3.select('body').append('div')
-                .attr('class', 'hidden tooltip');
+            .attr('class', 'hidden tooltip');
 
         var legendOrdinal = d3.legend.color()
-              .shape("path", d3.svg.symbol().type("square").size(150)())
-              .shapePadding(10)
-              .scale(ordinal);
+            .shape("path", d3.svg.symbol().type("square").size(150)())
+            .shapePadding(10)
+            .scale(ordinal);
 
         queue()
             .defer(d3.json, 'fedlands-topo.json')
@@ -122,20 +173,20 @@
             console.log(states);
             console.log(centers);
             console.log(stats);
-            
+
             var data = [];
 
-                centers.forEach(function(place) {
-                    data.push(Number(place.percent));
-                });
+            centers.forEach(function(place) {
+                data.push(Number(place.percent));
+            });
 
-                var min = Math.min.apply(Math, data),
-                      max = Math.max.apply(Math, data);
+            var min = Math.min.apply(Math, data),
+                max = Math.max.apply(Math, data);
 
-                var radius = d3.scale.sqrt()
-                    .domain([min, max])
-                    .range([29, 84.9]);
-            
+            var radius = d3.scale.sqrt()
+                .domain([min, max])
+                .range([29, 84.9]);
+
             svg.append("g")
                 .selectAll("path")
                 .data(states.features)
@@ -143,16 +194,17 @@
                 .append("path")
                 .attr("d", geoPath)
                 .attr("class", "state2");
-            
+
             svg.append('g')
                 .selectAll('path')
-                .data( topojson.feature(lands, lands.objects.fedland).features)
+                .data(topojson.feature(lands, lands.objects.fedland).features)
                 .enter()
                 .append('path')
-                .attr( "d", geoPath )
-                .attr("class", function(d) { return color(d.ADMIN1);
+                .attr("d", geoPath)
+                .attr("fill", function(d) {
+                    return ordinal(d.properties.ADMIN1);
                 })
-            
+
             svg.append("g")
                 .selectAll("path")
                 .data(states.features)
@@ -180,14 +232,26 @@
                 .on('mousemove', function(d, i) {
                     var currentPoint = this;
                     d3.select(this)
+                    .style({
+                            'fill': '#F69E23',
+                        })
                     tooltip.classed('hidden', 'false')
-                    .attr('style', 'left:' + (currentPoint[0] + 15) +
-                                'px; top:' + (currentPoint[1] - 35) + 'px')
-                        .html("State: " + d.long + '</br>' + d.percent + "% Federally Owned" + '</br>Total State Acres: ' + d.totalacre + '</br>Acres by Agency:</br>BLM: ' + d.blm + '</br>DOD: ' + d.dod + '</br>FS: ' + d.fs+ '</br>FWS: ' + d.fws+ '</br>NPS: ' + d.nps);
+                        .html(
+                            "<strong>State: </strong> <span style='color: whitesmoke'>" + d.long + "</span> </br> <p> </p> <strong>Federally Owned: </strong> <span style='color: whitesmoke'>" + d.percent + "%</span> </br> <p> </p> <strong>Total Acres: </strong> <span style='color: whitesmoke'>" + d.totalacre +
+                            "</span> </br> <p> </p> <strong>Acres by Agency:</br><li>BLM: </strong> <span style='color: whitesmoke'>" + d.blm +
+                            "</li> </span> </br> <strong> <li>DOD: </strong> <span style='color: whitesmoke'>" + d.dod +
+                            "</li> </span> </br> <strong> <li>FS: </strong> <span style='color: whitesmoke'>" + d.fs +
+                            "</li> </span> </br> <strong> <li>FWS: </strong> <span style='color: whitesmoke'>" + d.fws +
+                            "</li> </span> </br><strong> <li>NPS: </strong> <span style='color: whitesmoke'>" + d.nps +
+                            "</li> </span>");
                 })
                 .on('mouseout', function(d, i) {
+                    d3.select(this)
+                        .style({
+                            'fill': '#8B4513'
+                        });
                     tooltip.classed('hidden', 'true')
-                    .html("")
+                        .html("")
                 });
 
             svg.append("g")
