@@ -2,7 +2,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>AL Counties</title>
+    <title>FedLands</title>
 
     <link href="http://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
     <style>
@@ -54,6 +54,10 @@
             text-align: right;
         }
         
+        ul li {
+            margin: -7px;
+        }
+        
         #side-panel p {
             margin: 8px 0 4px;
             padding: 0 25px 0 15px;
@@ -100,9 +104,9 @@
         div.tooltip {
             position: absolute;
             left: 1400px;
-            top: 0;
+            top: 8px;
             bottom: 0;
-            width: 200;
+            width: 200px;
             color: #2d1606;
             background-color: #8B4513;
             padding: .5em;
@@ -110,6 +114,7 @@
         }
 
     </style>
+    
 </head>
 
 <body>
@@ -118,27 +123,41 @@
     <div id='side-panel'>
         <h1>Federal Owned Lands of the American West: </h1>
         <h2>It’s a lot</h2>
-        <p>reason for map</p>
-        <h3> About the map</h3>
+        <p>why a map</p>
+        <h3>About the map</h3>
         <p>describe map features like the radio buttons/check boxes, hover</p>
-        <h3> About the data</h3>
-        <p>sources, other category</p>
+        <h3>About the data</h3>
+        <p>sources, breakdown of the other category</p>
     </div>
+    
+<!--
+    <div class="filter_options">
+        <input class="filter_button" id="a_button" type="checkbox">a</input><br>
+        <input class="filter_button" id="b_button" type="checkbox">b</input><br>
+        <input class="filter_button" id="c_button" type="checkbox">c</input>
+    </div>
+-->
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.19/topojson.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.2/papaparse.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/1.10.0/d3-legend.min.js"></script>
 
     <script>
         var width = 900,
             height = 900;
+                
+        var zoom = d3.behavior.zoom()
+            .translate([width, height])
+            .scale(1)
+            .scaleExtent([1, 8])
+            .on("zoom", zoomed);
 
         var svg = d3.select("#map")
             .append("svg")
             .attr("width", width)
-            .attr("height", height);
+            .attr("height", height)
+            .call(zoom);
 
         var projection = d3.geo.conicConformal()
             .center([0, 40.5])
@@ -152,6 +171,8 @@
 
         var geoPath = d3.geo.path()
             .projection(projection);
+        
+        var center = projection([12, 42]);
 
         var tooltip = d3.select('body').append('div')
             .attr('class', 'hidden tooltip');
@@ -160,19 +181,19 @@
             .shape("path", d3.svg.symbol().type("square").size(150)())
             .shapePadding(10)
             .scale(ordinal);
+        
+        var formatAcre = d3.format(",");
 
         queue()
             .defer(d3.json, 'fedlands-topo.json')
             .defer(d3.json, 'eleven_states.json')
             .defer(d3.csv, 'elevenwest.csv')
-            .defer(d3.csv, 'land-data.csv')
             .await(makeMap);
 
-        function makeMap(error, lands, states, centers, stats) {
-            console.log(lands);
-            console.log(states);
-            console.log(centers);
-            console.log(stats);
+        function makeMap(error, lands, states, centers) {
+//            console.log(lands);
+//            console.log(states);
+//            console.log(centers);
 
             var data = [];
 
@@ -237,13 +258,13 @@
                         })
                     tooltip.classed('hidden', 'false')
                         .html(
-                            "<strong>State: </strong> <span style='color: whitesmoke'>" + d.long + "</span> </br> <p> </p> <strong>Federally Owned: </strong> <span style='color: whitesmoke'>" + d.percent + "%</span> </br> <p> </p> <strong>Total Acres: </strong> <span style='color: whitesmoke'>" + d.totalacre +
-                            "</span> </br> <p> </p> <strong>Acres by Agency:</br><li>BLM: </strong> <span style='color: whitesmoke'>" + d.blm +
-                            "</li> </span> </br> <strong> <li>DOD: </strong> <span style='color: whitesmoke'>" + d.dod +
-                            "</li> </span> </br> <strong> <li>FS: </strong> <span style='color: whitesmoke'>" + d.fs +
-                            "</li> </span> </br> <strong> <li>FWS: </strong> <span style='color: whitesmoke'>" + d.fws +
-                            "</li> </span> </br><strong> <li>NPS: </strong> <span style='color: whitesmoke'>" + d.nps +
-                            "</li> </span>");
+                            "<strong>State: </strong> <span style='color: #fac985'>" + d.long + "</span> </br> <p> </p> <strong>Federally Owned: </strong> <span style='color: #fac985'>" + d.percent + "%</span> </br> <p> </p> <strong>Total Acres: </strong> <span style='color: #fac985'>" + formatAcre(d.totalacre) +
+                            "</span> </br> <p> </p> <strong>Acres by Agency:</br> <ul> <li>BLM: </strong> <span style='color: #fac985'>" + formatAcre(d.blm) +
+                            "</li> </span> </br> <strong> <li>DOD: </strong> <span style='color: #fac985'>" + formatAcre(d.dod) +
+                            "</li> </span> </br> <strong> <li>FS: </strong> <span style='color: #fac985'>" + formatAcre(d.fs) +
+                            "</li> </span> </br> <strong> <li>FWS: </strong> <span style='color: #fac985'>" + formatAcre(d.fws) +
+                            "</li> </span> </br><strong> <li>NPS: </strong> <span style='color: #fac985'>" + formatAcre(d.nps) +
+                            "</li> </span> </ul>");
                 })
                 .on('mouseout', function(d, i) {
                     d3.select(this)
@@ -260,9 +281,19 @@
 
             svg.select(".legendOrdinal")
                 .call(legendOrdinal);
+            
+            zoomed();
+        }
+        
+        function zoomed() {
+          svg.append("g")
+              .attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
         }
 
+        d3.select(self.frameElement).style("height", height + "px");
+
     </script>
+    
 </body>
 
 </html>
