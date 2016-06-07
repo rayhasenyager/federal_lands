@@ -157,9 +157,7 @@
             .translate([width / 2, height / 2]);
                 
         var zoom = d3.behavior.zoom()
-            .translate([width / 2, height / 2])
-            .scale(2500)
-            .scaleExtent([2500, 10000])
+            .scaleExtent([1, 8])
             .on("zoom", zoomed);
         
         var geoPath = d3.geo.path()
@@ -241,78 +239,68 @@
                     return ordinal(d.properties.ADMIN1);
                 })
 
-//            g.append("g")
-//                .selectAll("path")
-//                .data(states.features)
-//                .enter()
-//                .append("path")
-//                .attr("d", geoPath)
-//                .attr("class", "state");
-//
-//            g.append("g")
-//                .selectAll("circle")
-//                .data(centers)
-//                .enter()
-//                .append("circle")
-//                .attr("cx", function(d) {
-//                    d.position = projection([d.lon, d.lat])
-//                    return d.position[0];
-//                })
-//                .attr("cy", function(d) {
-//                    return d.position[1];
-//                })
-//                .attr("r", function(d) {
-//                    return radius(d.percent)
-//                })
-//                .attr('class', 'centroid')
-//                .on('mousemove', function(d, i) {
-//                    var currentPoint = this;
-//                    d3.select(this)
-//                    .style({
-//                            'fill': '#F69E23',
-//                        })
-//                    tooltip.classed('hidden', 'false')
-//                        .html(
-//                            "<strong>State: </strong> <span style='color: #fac985'>" + d.long + "</span> </br> <p> </p> <strong>Federally Owned: </strong> <span style='color: #fac985'>" + d.percent + "%</span> </br> <p> </p> <strong>Total Acres: </strong> <span style='color: #fac985'>" + formatAcre(d.totalacre) +
-//                            "</span> </br> <p> </p> <strong>Acres by Agency:</br> <ul> <li>BLM: </strong> <span style='color: #fac985'>" + formatAcre(d.blm) +
-//                            "</li> </span> </br> <strong> <li>DOD: </strong> <span style='color: #fac985'>" + formatAcre(d.dod) +
-//                            "</li> </span> </br> <strong> <li>FS: </strong> <span style='color: #fac985'>" + formatAcre(d.fs) +
-//                            "</li> </span> </br> <strong> <li>FWS: </strong> <span style='color: #fac985'>" + formatAcre(d.fws) +
-//                            "</li> </span> </br><strong> <li>NPS: </strong> <span style='color: #fac985'>" + formatAcre(d.nps) +
-//                            "</li> </span> </ul>");
-//                })
-//                .on('mouseout', function(d, i) {
-//                    d3.select(this)
-//                        .style({
-//                            'fill': '#8B4513'
-//                        });
-//                    tooltip.classed('hidden', 'true')
-//                        .html("")
-//                });
-//
-//            svg.append("g")
-//                .attr("class", "legendOrdinal")
-//                .attr("transform", "translate(20,20)");
-//
-//            svg.select(".legendOrdinal")
-//                .call(legendOrdinal);
+            g.append("g")
+                .selectAll("path")
+                .data(states.features)
+                .enter()
+                .append("path")
+                .attr("d", geoPath)
+                .attr("class", "state");
+
+            g.append("g")
+                .selectAll("circle")
+                .data(centers)
+                .enter()
+                .append("circle")
+                .attr("cx", function(d) {
+                    d.position = projection([d.lon, d.lat])
+                    return d.position[0];
+                })
+                .attr("cy", function(d) {
+                    return d.position[1];
+                })
+                .attr("r", function(d) {
+                    return radius(d.percent)
+                })
+                .attr('class', 'centroid')
+                .on('mousemove', function(d, i) {
+                    var currentPoint = this;
+                    d3.select(this)
+                    .style({
+                            'fill': '#F69E23',
+                        })
+                    tooltip.classed('hidden', 'false')
+                        .html(
+                            "<strong>State: </strong> <span style='color: #fac985'>" + d.long + "</span> </br> <p> </p> <strong>Federally Owned: </strong> <span style='color: #fac985'>" + d.percent + "%</span> </br> <p> </p> <strong>Total Acres: </strong> <span style='color: #fac985'>" + formatAcre(d.totalacre) +
+                            "</span> </br> <p> </p> <strong>Acres by Agency:</br> <ul> <li>BLM: </strong> <span style='color: #fac985'>" + formatAcre(d.blm) +
+                            "</li> </span> </br> <strong> <li>DOD: </strong> <span style='color: #fac985'>" + formatAcre(d.dod) +
+                            "</li> </span> </br> <strong> <li>FS: </strong> <span style='color: #fac985'>" + formatAcre(d.fs) +
+                            "</li> </span> </br> <strong> <li>FWS: </strong> <span style='color: #fac985'>" + formatAcre(d.fws) +
+                            "</li> </span> </br><strong> <li>NPS: </strong> <span style='color: #fac985'>" + formatAcre(d.nps) +
+                            "</li> </span> </ul>");
+                })
+                .on('mouseout', function(d, i) {
+                    d3.select(this)
+                        .style({
+                            'fill': '#8B4513'
+                        });
+                    tooltip.classed('hidden', 'true')
+                        .html("")
+                });
+
+            svg.append("g")
+                .attr("class", "legendOrdinal")
+                .attr("transform", "translate(20,20)");
+
+            svg.select(".legendOrdinal")
+                .call(legendOrdinal);
             
         }
         
-//        function zoomed() {
-//          svg.append("g")
-//              .attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-//        }
-        
         function zoomed() {
-          
-          projection
-              .translate(zoom.translate())
-              .scale(zoom.scale());
-
-          g.selectAll("path")
-              .attr("d", geoPath);
+            g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
         }
+        
 
         d3.select(self.frameElement).style("height", height + "px");
 
