@@ -112,7 +112,10 @@
             padding: .5em;
             opacity: 1;
         }
-
+        .overlay {
+            fill: none;
+            pointer-events: all;
+        }
     </style>
     
 </head>
@@ -146,32 +149,37 @@
     <script>
         var width = 900,
             height = 900;
-                
-        var zoom = d3.behavior.zoom()
-            .translate([width, height])
-            .scale(1)
-            .scaleExtent([1, 8])
-            .on("zoom", zoomed);
-
-        var svg = d3.select("#map")
-            .append("svg")
-            .attr("width", width)
-            .attr("height", height)
-            .call(zoom);
-
+        
         var projection = d3.geo.conicConformal()
             .center([0, 40.5])
             .rotate([113, 0])
             .scale(2500)
             .translate([width / 2, height / 2]);
+                
+        var zoom = d3.behavior.zoom()
+            .scaleExtent([1, 8])
+            .on("zoom", zoomed);
+        
+        var geoPath = d3.geo.path()
+            .projection(projection);
+
+        var svg = d3.select("#map")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .append('g');
+        
+        var g = svg.append('g');
+
+	    svg.append('rect')
+            .attr('class', 'overlay')
+            .attr('width', width)
+            .attr('height', height);
 
         var ordinal = d3.scale.ordinal()
             .domain(["State/Private Owned Lands", "BLM", "DOD", "DOE", "FS", "FWS", "NPS", "Other"])
             .range(["#d9d9d9", "#428DBD", "#0B3660", "#C6A6E8", "#00502F", "#F69E23", "#C56C39", "#FC4D38"]);
 
-        var geoPath = d3.geo.path()
-            .projection(projection);
-        
         var center = projection([12, 42]);
 
         var tooltip = d3.select('body').append('div')
@@ -183,6 +191,11 @@
             .scale(ordinal);
         
         var formatAcre = d3.format(",");
+        
+        svg
+            .call(zoom)
+            .call(zoom.event);
+
 
         queue()
             .defer(d3.json, 'fedlands-topo.json')
@@ -208,7 +221,7 @@
                 .domain([min, max])
                 .range([29, 84.9]);
 
-            svg.append("g")
+            g.append("g")
                 .selectAll("path")
                 .data(states.features)
                 .enter()
@@ -216,7 +229,7 @@
                 .attr("d", geoPath)
                 .attr("class", "state2");
 
-            svg.append('g')
+            g.append('g')
                 .selectAll('path')
                 .data(topojson.feature(lands, lands.objects.fedland).features)
                 .enter()
@@ -226,7 +239,7 @@
                     return ordinal(d.properties.ADMIN1);
                 })
 
-            svg.append("g")
+            g.append("g")
                 .selectAll("path")
                 .data(states.features)
                 .enter()
@@ -234,7 +247,7 @@
                 .attr("d", geoPath)
                 .attr("class", "state");
 
-            svg.append("g")
+            g.append("g")
                 .selectAll("circle")
                 .data(centers)
                 .enter()
@@ -282,13 +295,12 @@
             svg.select(".legendOrdinal")
                 .call(legendOrdinal);
             
-            zoomed();
         }
         
         function zoomed() {
-          svg.append("g")
-              .attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+            g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
         }
+        
 
         d3.select(self.frameElement).style("height", height + "px");
 
