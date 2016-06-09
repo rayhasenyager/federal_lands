@@ -160,7 +160,7 @@
         div.tooltip {
             position: absolute;
             left: 1410px;
-            bottom: 400;
+            top: 400px;
             width: 200px;
             color: #2d1606;
             background-color: #8B4513;
@@ -171,7 +171,7 @@
         div.infoPanel {
             position: absolute;
             left: 1410px;
-            bottom: 400;
+            top: 400px;
             width: 200px;
             color: #2d1606;
             background-color: #8B4513;
@@ -378,20 +378,21 @@
                 .attr("d", geoPath)
                 .attr("fill", function(d) {
                     return ordinal(d.properties.ADMIN1)
-//                .on('mousemove', function(d, i) {
-//                    var currentPoint = this;
-//                    d3.select(this)
-//                    infoPanel.classed('hidden', 'false')
-//                        .html(
-//                            "<strong>Agency: </strong> <span style='color: #fac985'>" + d.properties.ADMIN1 + "</span> </br> <p> </p> <strong>Tract Name: </strong> <span style='color: #fac985'>" + d.properties.GNIS_NAME1 + "</span> </br> <p> </p> <strong>Description: </strong> <span style='color: #fac985'>" + d.properties.FEATURE1 +
-//                            "</li> </span> </ul>");
-//                })
-//                .on('mouseout', function(d, i) {
-//                    d3.select(this)
-//                    infoPanel.classed('hidden', 'true')
-//                        .html("")
-//                });
-            })
+                })
+                .on('mouseover', function(d, i) {
+                    console.log(d.properties.GNIS_Name1)
+                    var currentPoint = this;
+                    d3.select(this)
+                    infoPanel.classed('hidden', 'false')
+                        .html(
+                            "<strong>Agency: </strong> <span style='color: #fac985'>" + d.properties.ADMIN1 + "</span> </br> <p> </p> <strong>Tract Name: </strong> <span style='color: #fac985'>" + d.properties.GNIS_Name1 + "</span> </br> <p> </p> <strong>Description: </strong> <span style='color: #fac985'>" + d.properties.FEATURE1 +
+                            "</li> </span> </ul>");
+                })
+                .on('mouseout', function(d, i) {
+                    d3.select(this)
+                    infoPanel.classed('hidden', 'true')
+                        .html("")
+                });
 
             g.append("g")
                 .selectAll("path")
@@ -417,7 +418,7 @@
                     return radius(d.percent)
                 })
                 .attr('class', 'centroid')
-                .on('mousemove', function(d, i) {
+                .on('mouseover', function(d, i) {
                     var currentPoint = this;
                     d3.select(this)
                     .style({
