@@ -305,7 +305,6 @@
                 .enter()
                 .append('path')
                 .attr("d", geoPath)
-                .attr('class', 'land')
                 .attr("fill", function(d) {
                     return ordinal(d.properties.ADMIN1)
                 .on('mousemove', function(d, i) {
