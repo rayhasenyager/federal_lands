@@ -29,7 +29,7 @@
             padding: 8px 25px 8px 15px;
             margin: 0;
             background: #8B4513;
-            color: whitesmoke;
+            color: #fac985;
             font-weight: 400;
             font-size: 1.5em;
             text-align: right;
@@ -39,7 +39,7 @@
             padding: 0px 25px 8px 15px;
             margin: 0;
             background: #8B4513;
-            color: whitesmoke;
+            color: #fac985;
             font-weight: 300;
             font-size: 1.5em;
             text-align: right;
@@ -55,7 +55,9 @@
         }
         
         ul li {
-            margin: -7px;
+            margin: 0px;
+            list-style-type: none;
+            list-style-position: outside;
         }
         
         #side-panel p {
@@ -78,12 +80,15 @@
             position: absolute;
             left: 500px;
             top: 0;
-            border: 1px solid #8B4513;
+            border: 2px solid #2d1606;
             background: #FFEBCD;
+            pointer-events: auto;
         }
         
         .land {
             fill: #F0F8FF;
+            visibility: visible;
+            pointer-events: auto;
         }
         
         .state {
@@ -99,23 +104,48 @@
         
         .centroid {
             fill: #8B4513;
+            visibility: visible;
+            pointer-events: auto;
         }
         
         div.tooltip {
             position: absolute;
-            left: 1400px;
-            top: 8px;
-            bottom: 0;
+            left: 1410px;
+            bottom: 400;
             width: 200px;
             color: #2d1606;
             background-color: #8B4513;
             padding: .5em;
             opacity: 1;
         }
+        
+        div.infoPanel {
+            position: absolute;
+            left: 1410px;
+            bottom: 400;
+            width: 200px;
+            color: #2d1606;
+            background-color: #8B4513;
+            padding: .5em;
+            opacity: 1;
+        }
+        
         .overlay {
             fill: none;
-            pointer-events: all;
+            pointer-events: auto;
         }
+        
+        .additional-column {
+            position: absolute;
+            left: 1410px;
+            top: 8px;
+            width: 300px;
+            padding: .5em;
+            color: #2d1606;
+            background-color: #8B4513;
+            max-height: 1000px;
+        }
+        
     </style>
     
 </head>
@@ -124,7 +154,7 @@
 
     <div id="map"></div>
     <div id='side-panel'>
-        <h1>Federal Owned Lands of the American West: </h1>
+        <h1>Federally Owned Lands of the American West: </h1>
         <h2>It’s a lot</h2>
         <p>why a map</p>
         <h3>About the map</h3>
@@ -133,16 +163,54 @@
         <p>sources, breakdown of the other category</p>
     </div>
     
-<!--
-    <div class="filter_options">
-        <input class="filter_button" id="a_button" type="checkbox">a</input><br>
-        <input class="filter_button" id="b_button" type="checkbox">b</input><br>
-        <input class="filter_button" id="c_button" type="checkbox">c</input>
-    </div>
--->
+    <div class="additional-column">
+        <form>
+            <legend><strong>Select Layer(s):</strong></legend>
+            <ul>
+                <li>
+                    <input class="checkbox-mp" name="checkbox-h-1" id="checkbox-h-1" type="checkbox">
+                    <label for="checkbox-h-1"><span style='color: #fac985'>Bureau of Land Management</span></label>
+                </li>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script>
+                <li>
+                    <input class="checkbox-mp" name="checkbox-h-2" id="checkbox-h-2" type="checkbox">
+                    <label for="checkbox-h-2"><span style='color: #fac985'>Department of Defense</span></label>
+                </li>
+
+                <li>
+                    <input class="checkbox-mp" name="checkbox-h-3" id="checkbox-h-3" type="checkbox">
+                    <label for="checkbox-h-3"><span style='color: #fac985'>Department of Energy</span></label>
+                </li>
+
+                <li>
+                    <input class="checkbox-mp" name="checkbox-h-4" id="checkbox-h-4" type="checkbox">
+                    <label for="checkbox-h-4"><span style='color: #fac985'>Forest Service</span></label>
+                </li>
+
+                <li>
+                    <input class="checkbox-mp" name="checkbox-h-5" id="checkbox-h-5" type="checkbox">
+                    <label for="checkbox-h-5"><span style='color: #fac985'>Fish and Wildlife Service</span></label>
+                </li>
+
+                <li>
+                    <input class="checkbox-mp" name="checkbox-h-6" id="checkbox-h-6" type="checkbox">
+                    <label for="checkbox-h-6"><span style='color: #fac985'>National Park Service</span></label>
+                </li>
+
+                <li>
+                    <input class="checkbox-mp" name="checkbox-h-7" id="checkbox-h-7" type="checkbox">
+                    <label for="checkbox-h-7"><span style='color: #fac985'>Other</span></label>
+                </li>
+
+                <li>
+                    <input class="checkbox-mp" name="checkbox-h-8" id="checkbox-h-7" type="checkbox">
+                    <label for="checkbox-h-8"><span style='color: #fac985'>Federally Owned (%)</span></label>
+                </li>
+            </ul>
+        </form>
+    </div>
+
+    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.19/topojson.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/1.10.0/d3-legend.min.js"></script>
 
@@ -184,6 +252,9 @@
 
         var tooltip = d3.select('body').append('div')
             .attr('class', 'hidden tooltip');
+        
+        var infoPanel = d3.select('body').append('div')
+            .attr('class', 'hidden tooltip');
 
         var legendOrdinal = d3.legend.color()
             .shape("path", d3.svg.symbol().type("square").size(150)())
@@ -196,7 +267,6 @@
             .call(zoom)
             .call(zoom.event);
 
-
         queue()
             .defer(d3.json, 'fedlands-topo.json')
             .defer(d3.json, 'eleven_states.json')
@@ -204,10 +274,10 @@
             .await(makeMap);
 
         function makeMap(error, lands, states, centers) {
-//            console.log(lands);
+            console.log(lands);
 //            console.log(states);
 //            console.log(centers);
-
+            
             var data = [];
 
             centers.forEach(function(place) {
@@ -231,13 +301,27 @@
 
             g.append('g')
                 .selectAll('path')
-                .data(topojson.feature(lands, lands.objects.fedland).features)
+                .data(topojson.feature(lands, lands.objects.fedlands).features)
                 .enter()
                 .append('path')
                 .attr("d", geoPath)
+                .attr('class', 'land')
                 .attr("fill", function(d) {
-                    return ordinal(d.properties.ADMIN1);
+                    return ordinal(d.properties.ADMIN1)
+                .on('mousemove', function(d, i) {
+                    var currentPoint = this;
+                    d3.select(this)
+                    infoPanel.classed('hidden', 'false')
+                        .html(
+                            "<strong>Agency: </strong> <span style='color: #fac985'>" + d.properties.ADMIN1 + "</span> </br> <p> </p> <strong>Tract Name: </strong> <span style='color: #fac985'>" + d.properties.GNIS_NAME1 + "</span> </br> <p> </p> <strong>Description: </strong> <span style='color: #fac985'>" + d.properties.FEATURE1 +
+                            "</li> </span> </ul>");
                 })
+                .on('mouseout', function(d, i) {
+                    d3.select(this)
+                    infoPanel.classed('hidden', 'true')
+                        .html("")
+                });
+            })
 
             g.append("g")
                 .selectAll("path")
@@ -293,15 +377,13 @@
                 .attr("transform", "translate(20,20)");
 
             svg.select(".legendOrdinal")
-                .call(legendOrdinal);
-            
+                .call(legendOrdinal);            
         }
         
         function zoomed() {
-            g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+            g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")")
         }
         
-
         d3.select(self.frameElement).style("height", height + "px");
 
     </script>
