@@ -21,7 +21,8 @@
             width: 500px;
             height: 900px;
             background: whitesmoke;
-            border-right: 2px solid #8B4513;
+            border-right: 2px solid #2d1606;
+            border-bottom: 2px solid #2d1606;
             overflow-y: auto;
         }
         
@@ -83,6 +84,54 @@
             border: 2px solid #2d1606;
             background: #FFEBCD;
             pointer-events: auto;
+        }
+        
+        #legend {
+            position: absolute;
+            left: 150px;
+            top: 550px;
+            padding: 8px 15px;
+            background: #FFEBCD;
+            border: 2px solid #8B4513;
+            border-radius: 3px;
+            color: #8B4513;
+            width: 265px;
+        }
+
+        #legend h3 {
+            text-align: center;
+            font-weight: 500;
+            margin: 0 0 10px;
+        }
+
+        #legend h4 {
+            text-align: right;
+            font-weight: 500;
+            margin: 10px 0 5px;
+        }
+        #legend p {
+            margin: 0 0 5px;
+            text-align: right;
+        }
+
+        #legend span {
+            display: block;
+            border-radius: 50%/50%;
+            float: right;
+            height: 15px;
+            width: 15px;
+            text-align: right;
+            font-size: 9px;
+            color: #8B4513;
+            margin-left: 10px;
+        }
+        
+        #legend span.square {
+            border-radius: 0;
+        }
+        
+        #legend a {
+            color: #8B4513;
         }
         
         .land {
@@ -161,6 +210,28 @@
         <p>describe map features like the radio buttons/check boxes, hover</p>
         <h3>About the data</h3>
         <p>sources, breakdown of the other category</p>
+    </div>
+    <div id="legend">
+        <h3>Legend</h3>
+        <p class="percent"><span style='background:#8B4513;'></span><label>Information Circles </label>
+        </p>
+        <h4>Land Tracts:</h4>
+        <p class="zero"><span class="square" style='background:#d9d9d9;'></span><label>State/Private Owned Lands </label>
+        </p>
+        <p class="one"><span class="square" style='background:#428DBD;'></span><label>Bureau of Land Management </label>
+        </p>
+        <p class="two"><span class="square" style='background:#0B3660;'></span><label>Department of Defense </label>
+        </p>
+        <p class="three"><span class="square" style='background:#C6A6E8;'></span><label>Department of Energy </label>
+        </p>
+        <p class="four"><span class="square" style='background:#00502F;'></span><label>US Forest Service </label>
+        </p>
+        <p class="five"><span class="square" style='background:#F69E23;'></span><label>Fish and Wildlife Service </label>
+        </p>
+        <p class="six"><span class="square" style='background:#C56C39;'></span><label>National Park Service </label>
+        </p>
+        <p class="seven"><span class="square" style='background:#FC4D38;'></span><label>Other Agencies </label>
+        </p>
     </div>
     
     <div class="additional-column">
@@ -307,19 +378,19 @@
                 .attr("d", geoPath)
                 .attr("fill", function(d) {
                     return ordinal(d.properties.ADMIN1)
-                .on('mousemove', function(d, i) {
-                    var currentPoint = this;
-                    d3.select(this)
-                    infoPanel.classed('hidden', 'false')
-                        .html(
-                            "<strong>Agency: </strong> <span style='color: #fac985'>" + d.properties.ADMIN1 + "</span> </br> <p> </p> <strong>Tract Name: </strong> <span style='color: #fac985'>" + d.properties.GNIS_NAME1 + "</span> </br> <p> </p> <strong>Description: </strong> <span style='color: #fac985'>" + d.properties.FEATURE1 +
-                            "</li> </span> </ul>");
-                })
-                .on('mouseout', function(d, i) {
-                    d3.select(this)
-                    infoPanel.classed('hidden', 'true')
-                        .html("")
-                });
+//                .on('mousemove', function(d, i) {
+//                    var currentPoint = this;
+//                    d3.select(this)
+//                    infoPanel.classed('hidden', 'false')
+//                        .html(
+//                            "<strong>Agency: </strong> <span style='color: #fac985'>" + d.properties.ADMIN1 + "</span> </br> <p> </p> <strong>Tract Name: </strong> <span style='color: #fac985'>" + d.properties.GNIS_NAME1 + "</span> </br> <p> </p> <strong>Description: </strong> <span style='color: #fac985'>" + d.properties.FEATURE1 +
+//                            "</li> </span> </ul>");
+//                })
+//                .on('mouseout', function(d, i) {
+//                    d3.select(this)
+//                    infoPanel.classed('hidden', 'true')
+//                        .html("")
+//                });
             })
 
             g.append("g")
@@ -370,13 +441,6 @@
                     tooltip.classed('hidden', 'true')
                         .html("")
                 });
-
-            svg.append("g")
-                .attr("class", "legendOrdinal")
-                .attr("transform", "translate(20,20)");
-
-            svg.select(".legendOrdinal")
-                .call(legendOrdinal);            
         }
         
         function zoomed() {
