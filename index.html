@@ -449,13 +449,13 @@
 
                     if (d3.event.layerX < map_width / 100) {
                         d3.select("#tooltip-container")
-                            .style("top", (d3.event.layerY + 15) + "px")
-                            .style("left", (d3.event.layerX + 15) + "px");
+                            .style("top", (d3.event.pageY + 15) + "px")
+                            .style("left", (d3.event.pageX + 15) + "px");
                     } else {
                         var tooltip_width = $("#tooltip-container").width();
                         d3.select("#tooltip-container")
-                            .style("top", (d3.event.layerY + 15) + "px")
-                            .style("left", (d3.event.layerX - tooltip_width - 1) + "px");
+                            .style("top", (d3.event.pageY + 15) + "px")
+                            .style("left", (d3.event.pageX - tooltip_width - 1) + "px");
                     }
                 })
                 .on("mouseout", function() {
