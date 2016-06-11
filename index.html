@@ -20,7 +20,7 @@
             bottom: 0;
             width: 500px;
             height: 900px;
-            background: whitesmoke;
+            background: #fde9ce;
             border-right: 2px solid #2d1606;
             border-bottom: 2px solid #2d1606;
             overflow-y: auto;
@@ -76,7 +76,7 @@
             left: 500px;
             top: 0;
             border: 2px solid #2d1606;
-            background: #FFEBCD;
+            background: #fac985;
             pointer-events: auto;
         }
         
@@ -85,7 +85,7 @@
             left: 150px;
             top: 550px;
             padding: 8px 15px;
-            background: #FFEBCD;
+            background: #fac985;
             border: 2px solid #8B4513;
             border-radius: 3px;
             color: #8B4513;
@@ -141,7 +141,7 @@
         }
         
         .state2 {
-            fill: #d9d9d9;
+            fill: #fde9ce;
             stroke: none;
         }
         
@@ -259,7 +259,7 @@
 
     <div id="map"></div>
     <div id='side-panel'>
-        <h1>The Many, Many Federally Owned Lands of the American West</h1>
+        <h1>The Many, Many (Many) Federally Owned Lands of the American West</h1>
         <p>This map depicts Federally Owned lands of the eleven western states. The topic has been mapped before, but this map is interactive (hover over lands to see which agency controls it), see the proportion of each states owned by the Federal government, and it is represented using an appropriate map projection.</p>
         <h3>About the map</h3>
         <p>Use the radio buttons to switch between the lands and the information circles. Use your mouse to scroll or double click to zoom and hold down the mouse to pan the map.</p>
@@ -360,7 +360,7 @@
         var projection = d3.geo.conicConformal()
             .center([0, 40.5])
             .rotate([113, 0])
-            .scale(2500)
+            .scale(3200)
             .translate([width / 2, height / 2]);
 
         var zoom = d3.behavior.zoom()
@@ -445,16 +445,16 @@
 
                     var coordinates = d3.mouse(this);
 
-                    var map_width = $('svg')[0].getBoundingClientRect().width;
+                    var map_width = $('g')[0].getBoundingClientRect().width;
 
-                    if (d3.event.layerX < map_width / 2) {
+                    if (d3.event.layerX < map_width / 100) {
                         d3.select("#tooltip-container")
-                            .style("top", (d3.event.layerY + 1) + "px")
-                            .style("left", (d3.event.layerX + 1) + "px");
+                            .style("top", (d3.event.layerY + 15) + "px")
+                            .style("left", (d3.event.layerX + 15) + "px");
                     } else {
                         var tooltip_width = $("#tooltip-container").width();
                         d3.select("#tooltip-container")
-                            .style("top", (d3.event.layerY + 1) + "px")
+                            .style("top", (d3.event.layerY + 15) + "px")
                             .style("left", (d3.event.layerX - tooltip_width - 1) + "px");
                     }
                 })
@@ -499,17 +499,17 @@
 
                     var coordinates = d3.mouse(this);
 
-                    var map_width = $('svg')[0].getBoundingClientRect().width;
+                    var map_width = $('g')[0].getBoundingClientRect().width;
 
-                    if (d3.event.layerX < map_width / 2) {
+                    if (d3.event.layerX < map_width / 100) {
                         d3.select("#info-container")
-                            .style("top", (d3.event.layerY + 1) + "px")
-                            .style("left", (d3.event.layerX + 1) + "px");
+                            .style("top", (d3.event.layerY + 5) + "px")
+                            .style("left", (d3.event.layerX + 5) + "px");
                     } else {
                         var info_width = $("#info-container").width();
                         d3.select("#info-container")
-                            .style("top", (d3.event.layerY + 1) + "px")
-                            .style("left", (d3.event.layerX - info_width - 1) + "px");
+                            .style("top", (d3.event.layerY + 5) + "px")
+                            .style("left", (d3.event.layerX + info_width - 1) + "px");
                     }
                 })
                 .on("mouseout", function() {
