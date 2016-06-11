@@ -250,6 +250,11 @@
             list-style-type: none;
             height: 25px;
         }
+        
+        #toggle-circles {
+            font-size: 1.4em;
+            margin-left: 15px;
+        }
 
     </style>
 
@@ -265,6 +270,7 @@
         <p>Use the radio buttons to switch between the lands and the information circles. Use your mouse to scroll or double click to zoom and hold down the mouse to pan the map.</p>
         <h3>About the data</h3>
         <p><a href="http://nationalmap.gov/small_scale/atlasftp.html?openChapters=chpbound#chpbound">The National Map</a> from the <a href="https://opendata.go.ke/">The National Geological Survey</a> is the source for the land polygon data. The Federal Land Ownership: Overview and Data report from the Congressional Research Service was used for the information circle data; the 'Other Agencies' category is comprised of BOR, DOC, DOT, NASA, and USDA lands.</p>
+        <button id='toggle-circles'>toggle circles</button>
     </div>
     <div id="legend">
         <h3>Legend</h3>
@@ -449,13 +455,13 @@
 
                     if (d3.event.layerX < map_width / 100) {
                         d3.select("#tooltip-container")
-                            .style("top", (d3.event.layerY + 15) + "px")
-                            .style("left", (d3.event.layerX + 15) + "px");
+                            .style("top", (d3.event.pageY + 15) + "px")
+                            .style("left", (d3.event.pageX + 15) + "px");
                     } else {
                         var tooltip_width = $("#tooltip-container").width();
                         d3.select("#tooltip-container")
-                            .style("top", (d3.event.layerY + 15) + "px")
-                            .style("left", (d3.event.layerX - tooltip_width - 1) + "px");
+                            .style("top", (d3.event.pageY + 15) + "px")
+                            .style("left", (d3.event.pageX - tooltip_width - 1) + "px");
                     }
                 })
                 .on("mouseout", function() {
@@ -471,7 +477,7 @@
                 .attr("d", geoPath)
                 .attr("class", "state");
 
-            g.append("g")
+            var propCircles = g.append("g")
                 .selectAll("circle")
                 .data(centers)
                 .enter()
@@ -516,6 +522,16 @@
                     $(this).attr('class', 'centroid');
                     $("#info-container").hide();
                 });
+            
+                d3.select('#toggle-circles').on('click', function() {
+                    
+                    if(propCircles.style('visibility') === 'visible'){
+                        propCircles.style('visibility','hidden');
+                    } else {
+                        propCircles.style('visibility','visible');
+                    }
+                    
+                })
         }
 
         function zoomed() {
