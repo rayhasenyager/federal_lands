@@ -1,232 +1,178 @@
-var dataLayer,
-    cattle,
-    goats,
-    sheep,
-    total,
-    density,
-    scaleFactor = .05;
+var width = 900,
+    height = 900;
 
-L.mapbox.accessToken = 'pk.eyJ1IjoicmF5aGFzZW55YWdlciIsImEiOiJjaW03djhsZGswMHBvdm1tMHdvam54djRzIn0.E4iemJxzce4ZKFxgLjT57w';
+var projection = d3.geo.conicConformal()
+    .center([0, 40.5])
+    .rotate([113, 0])
+    .scale(3200)
+    .translate([width / 2, height / 2]);
 
-var map = L.mapbox.map('map', 'mapbox.outdoors', {
-    center: [-.23, 37.8],
-    zoom: 7,
-    minZoom: 6,
-    maxZoom: 9,
-    maxBounds: L.latLngBounds([-6.22, 27.72], [5.76, 47.83])
-});
+var zoom = d3.behavior.zoom()
+    .scaleExtent([1, 8])
+    .on("zoom", zoomed);
 
-var countyCentroids = omnivore.csv('data/livestock_county_2009.csv')
-    .on('ready', function(e) {
-        drawMap(e.target.toGeoJSON());
-    })
-    .on('error', function(e) {
-        console.log(e.error[0].message);
+var geoPath = d3.geo.path()
+    .projection(projection);
+
+var svg = d3.select("#map")
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .append('g');
+
+var g = svg.append('g');
+
+svg.append('rect')
+    .attr('class', 'overlay')
+    .attr('width', width)
+    .attr('height', height);
+
+var ordinal = d3.scale.ordinal()
+    .domain(["State/Private Owned Lands", "BLM", "DOD", "DOE", "FS", "FWS", "NPS", "Other"])
+    .range(["#d9d9d9", "#428DBD", "#0B3660", "#C6A6E8", "#00502F", "#F69E23", "#C56C39", "#FC4D38"]);
+
+var center = projection([12, 42]);
+
+var formatAcre = d3.format(",");
+
+svg
+    .call(zoom)
+    .call(zoom.event);
+
+queue()
+    .defer(d3.json, 'data/fedlands-topo.json')
+    .defer(d3.json, 'data/eleven_states.json')
+    .defer(d3.csv, 'data/elevenwest.csv')
+    .await(makeMap);
+
+function makeMap(error, lands, states, centers) {
+    //            console.log(lands);
+
+    var data = [];
+
+    centers.forEach(function(place) {
+        data.push(Number(place.percent));
     });
 
-function drawMap(stockData) {
-    // access to stockData here
-}
+    var min = Math.min.apply(Math, data),
+        max = Math.max.apply(Math, data);
 
-function drawMap(stockData) {
+    var radius = d3.scale.sqrt()
+        .domain([min, max])
+        .range([29, 84.9]);
 
-    cattle = L.geoJson(stockData, {
-        pointToLayer: function(feature, layer) {
-            return L.circleMarker(layer, {
-                radius: calcRadius(Number(feature.properties.Cattle)),
-                color: '#6813D2',
-                opacity: 1,
-                weight: 2,
-                fillOpacity: 0
-            });
-        }
-    }).addTo(map);
+    g.append("g")
+        .selectAll("path")
+        .data(states.features)
+        .enter()
+        .append("path")
+        .attr("d", geoPath)
+        .attr("class", "state2");
 
-    goats = L.geoJson(stockData, {
-        pointToLayer: function(feature, layer) {
-            return L.circleMarker(layer, {
-                radius: calcRadius(Number(feature.properties.Goats)),
-                color: '#DAA520',
-                opacity: 1,
-                weight: 2,
-                fillOpacity: 0
-            });
-        }
-    }).addTo(map);
+    g.append('g')
+        .selectAll('path')
+        .data(topojson.feature(lands, lands.objects.fedlands).features)
+        .enter()
+        .append('path')
+        .attr("d", geoPath)
+        .attr("fill", function(d) {
+            return ordinal(d.properties.ADMIN1)
+        })
+        .on("mousemove", function(d) {
+            var html = "";
+            html +=
+                "<ul><ui><strong>Agency: </strong> <span style='color: #8B4513'>" + d.properties.ADMIN1 + "</span> </br> <strong>Tract: </strong> <span style='color: #8B4513'>" + d.properties.GNIS_Name1 + "</span> </br> <strong>Type: </strong> <span style='color: #8B4513'>" + d.properties.FEATURE1 + "</li> </span> </ul>";
 
-    sheep = L.geoJson(stockData, {
-        pointToLayer: function(feature, layer) {
-            return L.circleMarker(layer, {
-                radius: calcRadius(Number(feature.properties.Sheep)),
-                color: '#008000',
-                opacity: 1,
-                weight: 2,
-                fillOpacity: 0
-            });
-        }
-    }).addTo(map);
-    drawLegend();
-    infoWindow();
-}
+            $("#tooltip-container").html(html);
+            $(this).attr("fill-opacity", "0.7");
+            $("#tooltip-container").show();
 
-function calcRadius(val) {
-    var radius = Math.sqrt(val / Math.PI);
-    return radius * scaleFactor;
-}
+            var coordinates = d3.mouse(this);
 
-function drawLegend() {
+            var map_width = $('g')[0].getBoundingClientRect().width;
 
-    var legend = $('.legend');
-
-    legend.html()
-}
-
-$.getJSON('data/county.geojson', function(county) {
-
-    dataLayer = L.geoJson(county, {
-        style: function(feature) {
-            return {
-                color: '#dddddd', //grey borders
-                weight: 2, //border thickness
-                fillOpacity: .3, //no opacity
-                fillColor: '#CCC7B3'
-            };
-        }
-    });
-    drawCounties(county);
-});
-
-function infoWindow() {
-
-    var info = $('#info');
-
-    sheep.on('mouseover', function(e) {
-        var props = e.layer.feature.properties;
-
-        info.show();
-        $('#info span').text(props.County);
-        $(".cattle span:first-child").text(' ');
-        $(".goats span:first-child").text('');
-        $(".sheep span:first-child").text(' ');
-        $(".density span:first-child").text(' ');
-
-        $(".cattle span:last-child").text(props.Cattle.toLocaleString());
-        $(".goats span:last-child").text(props.Goats.toLocaleString());
-        $(".sheep span:last-child").text(props.Sheep.toLocaleString());
-        $(".density span:last-child").text(props.density.toLocaleString());
-
-        e.layer.setStyle({
-            fillOpacity: .4
-        });
-    });
-
-    sheep.on('mouseout', function(e) {
-        info.hide();
-        e.layer.setStyle({
-            fillOpacity: 0
-        });
-    });
-
-    $(document).mousemove(function(e) {
-        // first offset from the mouse position of the info window
-        info.css({
-            "left": e.pageX + 6,
-            "top": e.pageY - info.height() - 15
-        });
-        // if it crashes into the top, flip it lower right
-        if (info.offset().top < 4) {
-            info.css({
-                "top": e.pageY + 15
-            });
-        }
-        // do the same for crashing into the right
-        if (info.offset().left + info.width() >= $(document).width() - 40) {
-            info.css({
-                "left": e.pageX - info.width() - 30
-            });
-        }
-    });
-}
-
-function drawCounties(county) {
-    dataLayer = L.geoJson(county, {
-
-        // initially set polygon border and fill properties
-        style: function(feature) {
-                return {
-                    color: '#A9A9A9',
-                    weight: 1,
-                    fillOpacity: 1,
-                    fillColor: '#1f78b4'
-                }
+            if (d3.event.layerX < map_width / 100) {
+                d3.select("#tooltip-container")
+                    .style("top", (d3.event.pageY + 15) + "px")
+                    .style("left", (d3.event.pageX + 15) + "px");
+            } else {
+                var tooltip_width = $("#tooltip-container").width();
+                d3.select("#tooltip-container")
+                    .style("top", (d3.event.pageY + 15) + "px")
+                    .style("left", (d3.event.pageX - tooltip_width - 1) + "px");
             }
-            // add polygons to the map    
-    }).addTo(map).bringToBack();
-    // fires the function to update the map for user functionality
-    updateMap();
-}
-
-function updateMap() {
-
-    var breaks = getClassBreaks();
-
-    dataLayer.eachLayer(function(layer) {
-        layer.setStyle({
-            color: '#A9A9A9',
-            weight: 1,
-            fillColor: getColor(layer.feature.properties.density, breaks),
-            fillOpacity: 1,
+        })
+        .on("mouseout", function() {
+            $(this).attr("fill-opacity", "1.0");
+            $("#tooltip-container").hide();
         });
 
-        var props = layer.feature.properties;
-    });
-    updateLegend(breaks);
+    g.append("g")
+        .selectAll("path")
+        .data(states.features)
+        .enter()
+        .append("path")
+        .attr("d", geoPath)
+        .attr("class", "state");
+
+    var propCircles = g.append("g")
+        .selectAll("circle")
+        .data(centers)
+        .enter()
+        .append("circle")
+        .attr("cx", function(d) {
+            d.position = projection([d.lon, d.lat])
+            return d.position[0];
+        })
+        .attr("cy", function(d) {
+            return d.position[1];
+        })
+        .attr("r", function(d) {
+            return radius(d.percent)
+        })
+        .attr('class', 'centroid')
+        .on("mousemove", function(d, i) {
+            var html = "";
+            html +=
+                "<strong>State: </strong> <span style='color: #8B4513'>" + d.long + "</span></br><strong>Federally Owned: </strong><span style='color: #8B4513'>" + d.percent + "%</span> </br><strong>Total Acres: </strong><span style='color: #8B4513'>" + formatAcre(d.totalacre) + "</span></br> <p> </p> <strong>Acres by Agency:</br> BLM: </strong> <span style='color: #8B4513'>" + formatAcre(d.blm) +
+                "</span> </br> <strong> DOD: </strong> <span style='color: #8B4513'>" + formatAcre(d.dod) + "</span> </br> <strong> FS: </strong> <span style='color: #8B4513'>" + formatAcre(d.fs) + " </span> </br> <strong> FWS: </strong> <span style='color: #8B4513'>" + formatAcre(d.fws) + " </span> </br><strong> NPS: </strong> <span style='color: #8B4513'>" + formatAcre(d.nps) + " </span>";
+
+            $("#info-container").html(html);
+            $(this).attr('class', 'centroidOff');
+            $("#info-container").show();
+
+            var coordinates = d3.mouse(this);
+
+            var map_width = $('g')[0].getBoundingClientRect().width;
+
+            if (d3.event.layerX < map_width / 100) {
+                d3.select("#info-container")
+                    .style("top", (d3.event.layerY + 5) + "px")
+                    .style("left", (d3.event.layerX + 5) + "px");
+            } else {
+                var info_width = $("#info-container").width();
+                d3.select("#info-container")
+                    .style("top", (d3.event.layerY + 5) + "px")
+                    .style("left", (d3.event.layerX + info_width - 1) + "px");
+            }
+        })
+        .on("mouseout", function() {
+            $(this).attr('class', 'centroid');
+            $("#info-container").hide();
+        });
+
+    d3.select('#toggle-circles').on('click', function() {
+
+        if (propCircles.style('visibility') === 'visible') {
+            propCircles.style('visibility', 'hidden');
+        } else {
+            propCircles.style('visibility', 'visible');
+        }
+    })
 }
 
-function updateLegend(breaks) {
-
-    var legend = $('.legend').html("<h3>% Growth: " + (Number(density)) + "</h3><ul>");
-
-    for (var i = 0; i < breaks.length - 1; i++) {
-
-        var color = getColor(breaks[i + 1], breaks);
-
-        $('.legend ul').append('<li><span style="background:' + color + '"></span> ' + breaks[i] + ' &mdash; ' + breaks[i + 1] + '</li>');
-    }
-
-    legend.append("</ul>");
+function zoomed() {
+    g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")")
 }
 
-function getClassBreaks() {
-
-    var values = [];
-
-    dataLayer.eachLayer(function(layer) {
-        var value = layer.feature.properties.density;
-
-        values.push(value);
-    });
-
-    var clusters = ss.ckmeans(values, 5);
-
-    var breaks = clusters.map(function(cluster) {
-        return [cluster[0], cluster.pop()];
-    });
-
-    return breaks;
-}
-
-function getColor(d, breaks) {
-
-    if (d <= breaks[0][1]) {
-        return '#ca641c';
-    } else if (d <= breaks[1][1]) {
-        return '#9d4e15';
-    } else if (d <= breaks[2][1]) {
-        return '#874312';
-    } else if (d <= breaks[3][1]) {
-        return '#5a2d0c'
-    } else if (d <= breaks[4][1]) {
-        return '#2d1606'
-    }
-}
+d3.select(self.frameElement).style("height", height + "px");
