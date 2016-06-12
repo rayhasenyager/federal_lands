@@ -143,7 +143,7 @@ h4 {
 }
 
 .centroidOff {
-    fill: #fac985;
+    fill: #ff8c00;
     pointer-events: auto;
 }
 
@@ -165,7 +165,7 @@ h4 {
 
 a:link {
     text-decoration: none;
-    color: #8B4513;
+    color: #cc7000;
 }
 
 a:hover {
@@ -173,7 +173,7 @@ a:hover {
 }
 
 a:visited {
-    color: #8B4513;
+    color: #cc7000;
 }
 
 #tooltip-container {
