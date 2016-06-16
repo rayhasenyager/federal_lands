@@ -3,8 +3,8 @@ var width = 900,
 
 var projection = d3.geo.conicConformal()
     .center([0, 40.5])
-    .rotate([113, 0])
-    .scale(3200)
+    .rotate([112, 0])
+    .scale(3000)
     .translate([width / 2, height / 2]);
 
 var zoom = d3.behavior.zoom()
@@ -42,11 +42,13 @@ svg
 queue()
     .defer(d3.json, 'data/fedlands-topo.json')
     .defer(d3.json, 'data/eleven_states.json')
+    .defer(d3.json, 'data/countries.json')
+    .defer(d3.json, 'data/borders.json')
+    .defer(d3.json, 'data/usa.json')
     .defer(d3.csv, 'data/elevenwest.csv')
     .await(makeMap);
 
-function makeMap(error, lands, states, centers) {
-    //            console.log(lands);
+function makeMap(error, lands, states, countries, borders, usa, centers) {
 
     var data = [];
 
@@ -61,6 +63,30 @@ function makeMap(error, lands, states, centers) {
         .domain([min, max])
         .range([29, 84.9]);
 
+    g.append("g")
+        .selectAll("path")
+        .data(usa.features)
+        .enter()
+        .append("path")
+        .attr("d", geoPath)
+        .attr("class", "usa");
+    
+    g.append("g")
+        .selectAll("path")
+        .data(countries.features)
+        .enter()
+        .append("path")
+        .attr("d", geoPath)
+        .attr("class", "countries");
+    
+    g.append("g")
+        .selectAll("path")
+        .data(borders.features)
+        .enter()
+        .append("path")
+        .attr("d", geoPath)
+        .attr("class", "usa");
+    
     g.append("g")
         .selectAll("path")
         .data(states.features)
@@ -145,10 +171,10 @@ function makeMap(error, lands, states, centers) {
 
             var map_width = $('g')[0].getBoundingClientRect().width;
 
-            if (d3.event.layerX < map_width / 100) {
+            if (d3.event.layerX < map_width / 1000) {
                 d3.select("#info-container")
-                    .style("top", (d3.event.layerY + 5) + "px")
-                    .style("left", (d3.event.layerX + 5) + "px");
+                    .style("top", (d3.event.layerY + 15) + "px")
+                    .style("left", (d3.event.layerX + 15) + "px");
             } else {
                 var info_width = $("#info-container").width();
                 d3.select("#info-container")
@@ -159,14 +185,15 @@ function makeMap(error, lands, states, centers) {
         .on("mouseout", function() {
             $(this).attr('class', 'centroid');
             $("#info-container").hide();
-        });
+        })
 
-    d3.select('#toggle-circles').on('click', function() {
+    d3.select('#toggle-circles')
+        .on('click', function() {
 
         if (propCircles.style('visibility') === 'visible') {
-            propCircles.style('visibility', 'hidden');
+            propCircles.style('visibility', 'hidden')
         } else {
-            propCircles.style('visibility', 'visible');
+            propCircles.style('visibility', 'visible')
         }
     })
 }

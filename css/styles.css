@@ -12,7 +12,7 @@ h1 {
     color: #fac985;
     font-family: 'Alfa Slab One', cursive;
     font-weight: 400;
-    font-size: 1.4em;
+    font-size: 1.3em;
     text-align: right;
 }
 
@@ -32,7 +32,7 @@ h3 {
     color: #8B4513;
     font-family: 'Alfa Slab One', cursive;
     font-weight: 500;
-    font-size: 1.2em;
+    font-size: 1.1em;
     text-align: center;
 }
 
@@ -42,18 +42,24 @@ h4 {
     color: #8B4513;
     font-family: 'Gentium Book Basic', serif;
     font-weight: 500;
-    font-size: 1.2em;
+    font-size: 1.1em;
     text-align: right;
+}
+
+p {
+    font-family: 'Gentium Book Basic', serif;
+    font-weight: 500;
+    font-size: 1em;
 }
 
 #map {
     width: 900px;
     height: 900px;
     position: absolute;
-    left: 425px;
+    left: 375px;
     top: 0;
     border: 2px solid #2d1606;
-    background: #fac985;
+    background: #E0FFFF;
     pointer-events: auto;
 }
 
@@ -62,7 +68,7 @@ h4 {
     left: 0;
     top: 0;
     bottom: 0;
-    width: 425px;
+    width: 375px;
     height: 900px;
     background: #fde9ce;
     border-right: 2px solid #2d1606;
@@ -75,7 +81,7 @@ h4 {
     padding: 0 25px 0 15px;
     color: #3d3d3d;
     text-align: right;
-    font-size: 1em;
+    font-size: .97em;
 }
 
 #side-panel p:after {
@@ -86,8 +92,8 @@ h4 {
 
 #legend {
     position: absolute;
-    left: 60px;
-    top: 540px;
+    left: 35px;
+    top: 565px;
     padding: 8px 15px;
     background: #fac985;
     border: 2px solid #8B4513;
@@ -137,13 +143,38 @@ h4 {
     stroke: none;
 }
 
+.usa {
+    fill: #cccccc;
+    stroke: #8B4513;
+    stroke-width: 1.5px;
+}
+
+.borders {
+    fill: none;
+    stroke: #F0F8FF;
+    stroke-width: 1.5px;
+}
+
+.countries {
+    fill: #595959;
+}
+
 .centroid {
-    fill: #8B4513;
+    fill: #FC4D38;
+    fill-opacity: .01;
+    stroke: #FC4D38;
+    stroke-width: 6px;
     pointer-events: auto;
 }
 
 .centroidOff {
     fill: #ff8c00;
+<<<<<<< HEAD
+    fill-opacity: .01;
+    stroke: #ff8c00;
+    stroke-width: 6px;
+=======
+>>>>>>> origin/master
     pointer-events: auto;
 }
 
@@ -178,7 +209,7 @@ a:visited {
 
 #tooltip-container {
     position: absolute;
-    border-radius: 20px;
+    border-radius: 3px;
     color: #2d1606;
     background-color: #fac985;
     padding: .5em;
@@ -200,7 +231,7 @@ a:visited {
 
 #info-container {
     position: absolute;
-    border-radius: 20px;
+    border-radius: 3px;
     color: #2d1606;
     background-color: #fac985;
     padding: .5em;
@@ -221,10 +252,16 @@ a:visited {
 }
 
 #toggle-circles {
-    background: #8B4513;
+    background: #FC4D38;
     color: #fac985;
     font-family: 'Gentium Book Basic', serif;
     font-weight: 500;
+<<<<<<< HEAD
+    font-size: 1.1em;
+    margin-left: 135;
+}
+=======
     font-size: 1.2em;
     margin-left: 155;
 }
+>>>>>>> origin/master
