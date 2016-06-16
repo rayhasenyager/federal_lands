@@ -168,19 +168,10 @@ p {
 }
 
 .centroidOff {
-    fill: #ff8c00;
-<<<<<<< HEAD
+    stroke-width: 6px;
     fill-opacity: .01;
     stroke: #ff8c00;
     stroke-width: 6px;
-=======
-<<<<<<< HEAD
-    fill-opacity: .01;
-    stroke: #ff8c00;
-    stroke-width: 6px;
-=======
->>>>>>> origin/master
->>>>>>> refs/remotes/origin/master
     pointer-events: auto;
 }
 
@@ -262,18 +253,6 @@ a:visited {
     color: #fac985;
     font-family: 'Gentium Book Basic', serif;
     font-weight: 500;
-<<<<<<< HEAD
     font-size: 1.1em;
     margin-left: 135;
 }
-=======
-<<<<<<< HEAD
-    font-size: 1.1em;
-    margin-left: 135;
-}
-=======
-    font-size: 1.2em;
-    margin-left: 155;
-}
->>>>>>> origin/master
->>>>>>> refs/remotes/origin/master
