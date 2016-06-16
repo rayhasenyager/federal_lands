@@ -160,9 +160,9 @@ p {
 }
 
 .centroid {
-    fill: #FC4D38;
+    fill: #fb1d04;
     fill-opacity: .01;
-    stroke: #FC4D38;
+    stroke: #fb1d04;
     stroke-width: 6px;
     pointer-events: auto;
 }
@@ -249,7 +249,7 @@ a:visited {
 }
 
 #toggle-circles {
-    background: #FC4D38;
+    background: #fb1d04;
     color: #fac985;
     font-family: 'Gentium Book Basic', serif;
     font-weight: 500;

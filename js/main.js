@@ -3,7 +3,7 @@ var width = 900,
 
 var projection = d3.geo.conicConformal()
     .center([0, 40.5])
-    .rotate([112, 0])
+    .rotate([110.5, 0, -3])
     .scale(3000)
     .translate([width / 2, height / 2]);
 
@@ -31,7 +31,7 @@ var ordinal = d3.scale.ordinal()
     .domain(["State/Private Owned Lands", "BLM", "DOD", "DOE", "FS", "FWS", "NPS", "Other"])
     .range(["#d9d9d9", "#428DBD", "#0B3660", "#C6A6E8", "#00502F", "#F69E23", "#C56C39", "#FC4D38"]);
 
-var center = projection([12, 42]);
+var center = projection([112.5, 40.5]);
 
 var formatAcre = d3.format(",");
 
