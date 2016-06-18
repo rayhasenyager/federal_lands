@@ -6,7 +6,7 @@ body {
 }
 
 h1 {
-    padding: 8px 25px 8px 15px;
+    padding: 8px 25px 0px 15px;
     margin: 0;
     background: #8B4513;
     color: #fac985;
@@ -18,11 +18,11 @@ h1 {
 
 h2 {
     margin: 0;
-    padding: 5px 25px 5px 15px;
+    padding: 5px 25px 0px 15px;
     color: #8B4513;
     font-family: 'Alfa Slab One', cursive;
     font-weight: 500;
-    font-size: 1.2em;
+    font-size: 1.1em;
     text-align: right;
 }
 
@@ -32,7 +32,7 @@ h3 {
     color: #8B4513;
     font-family: 'Alfa Slab One', cursive;
     font-weight: 500;
-    font-size: 1.1em;
+    font-size: 1em;
     text-align: center;
 }
 
@@ -42,21 +42,21 @@ h4 {
     color: #8B4513;
     font-family: 'Gentium Book Basic', serif;
     font-weight: 500;
-    font-size: 1.1em;
+    font-size: 1em;
     text-align: right;
 }
 
 p {
     font-family: 'Gentium Book Basic', serif;
     font-weight: 500;
-    font-size: 1em;
+    font-size: .9em;
 }
 
 #map {
     width: 900px;
-    height: 900px;
+    height: 825px;
     position: absolute;
-    left: 375px;
+    left: 400px;
     top: 0;
     border: 2px solid #2d1606;
     background: #E0FFFF;
@@ -68,8 +68,8 @@ p {
     left: 0;
     top: 0;
     bottom: 0;
-    width: 375px;
-    height: 900px;
+    width: 400px;
+    height: 825px;
     background: #fde9ce;
     border-right: 2px solid #2d1606;
     border-bottom: 2px solid #2d1606;
@@ -93,7 +93,7 @@ p {
 #legend {
     position: absolute;
     left: 35px;
-    top: 565px;
+    top: 500px;
     padding: 8px 15px;
     background: #fac985;
     border: 2px solid #8B4513;
@@ -253,6 +253,17 @@ a:visited {
     color: #fac985;
     font-family: 'Gentium Book Basic', serif;
     font-weight: 500;
-    font-size: 1.1em;
-    margin-left: 135;
+    font-size: 1.2em;
+    margin-left: 128;
+}
+
+#portfolio {
+    position: absolute;
+    left: 0;
+    top: 795;
+    margin: 8px 0 4px;
+    padding: 0 25px 0 15px;
+    color: #3d3d3d;
+    text-align: right;
+    font-size: .97em;
 }

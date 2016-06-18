@@ -1,10 +1,10 @@
 var width = 900,
-    height = 900;
+    height = 825;
 
 var projection = d3.geo.conicConformal()
     .center([0, 40.5])
     .rotate([110.5, 0, -3])
-    .scale(3000)
+    .scale(2700)
     .translate([width / 2, height / 2]);
 
 var zoom = d3.behavior.zoom()
